@@ -1,111 +1,149 @@
-#include <iostream>
-#include <vector>
-#include <cstring>
-#include <algorithm>
-
+#include<iostream>
+#include<algorithm>
+#include <cmath>
+#include<vector>
+#include <queue>
 using namespace std;
 
-int N,K;
-int num[11];
-int where[11];
-bool chk[11];
-int res=98787987;
-vector <int> node[11];
+int people[11];
+int visit[11];
+int visit_2[11];
+vector< vector<int> > v(11);
+int n;
+int answer = 987654321;
+int sum_1 = 0;
+int sum_2 = 0;
+int flag;
 
-void dfs(int n, int k)
+
+
+void possible()
 {
-    for(int i=0;i<node[n].size();i++)
-    {
-        if(chk[node[n][i]]==false&&where[node[n][i]]==k)
-        {
-            chk[node[n][i]]=true;
-            dfs(node[n][i],k);
-        }
-    }
+	vector<int> team_1, team_2;
+	queue<int> q;
+	for (int i = 1; i <= n; i++)
+		visit_2[i] = 0;
+
+	for (int i = 1; i <= n; i++)
+	{
+		if (visit[i] == 0)
+			team_1.push_back(i);
+		else
+			team_2.push_back(i);
+	}
+
+	q.push(team_1[0]);
+	visit_2[team_1[0]] = 1;
+	int count = 1;
+
+	while (!q.empty())
+	{
+		int a = q.front();
+		q.pop();
+		for (int i = 0; i < v[a].size(); i++)
+		{
+			if (find(team_1.begin(), team_1.end(), v[a][i]) != team_1.end())
+			{
+				if (visit_2[v[a][i]] == 0)
+				{
+					count++;
+					visit_2[v[a][i]] = 1;
+					q.push(v[a][i]);
+				}
+			}
+		}
+	}
+
+	if (count != team_1.size())
+		flag = 0;
+
+
+	count = 1;
+	q.push(team_2[0]);
+	visit_2[team_2[0]] = 1;
+
+	while (!q.empty())
+	{
+		int a = q.front();
+		q.pop();
+		for (int i = 0; i < v[a].size(); i++)
+		{
+			if (find(team_2.begin(), team_2.end(), v[a][i]) != team_2.end())
+			{
+				if (visit_2[v[a][i]] == 0)
+				{
+					count++;
+					visit_2[v[a][i]] = 1;
+					q.push(v[a][i]);
+				}
+			}
+		}
+	}
+
+	if (count != team_2.size())
+		flag = 0;
 }
 
-bool chking(){
-
-    for(int i=1;i<=N;i++)
-    {
-        if(where[i]==1){
-            chk[i]=true;
-            dfs(i,1);
-            break;
-        }
-    }
-
-    for(int i=1;i<=N;i++)
-    {
-        if(where[i]==0){
-            chk[i]=true;
-            dfs(i,0);
-            break;
-        }
-    }
-
-    for(int i=1;i<=N;i++)
-    {
-        if(chk[i]==false)   return false;
-    }
-    return true;
-}
-
-void combi(int cnt)
+void make_team(int now, int cnt, int size) 
 {
-    if(cnt==N)
-    {
-        memset(chk,false,sizeof(chk));
-        if(chking())
-        {
-            int sum1=0, sum2=0;
-            for(int i=1;i<=N;i++)
-            {
-                if(where[i]==1)
-                {
-                    sum1+=num[i];
-                }
-                else
-                {
-                    sum2+=num[i];
-                }
-            }
-            int result = abs(sum1-sum2);
-            if(res>result)  res=result;
-        }
-        return;
-    }
-    where[cnt+1]=1;
-    combi(cnt+1);
-    where[cnt+1]=0;
-    combi(cnt+1);
+	if (cnt == size)
+	{
+		flag = 1;
+		possible();
+		if (flag ==1 )
+		{
+			sum_1 = 0;
+			sum_2 = 0;
+			for (int i = 1; i <= n; i++)
+			{
+				if (visit[i] == 0)
+					sum_1 += people[i];
+				else
+					sum_2 += people[i];
+
+			}
+
+			answer = min(answer, abs(sum_1 - sum_2));
+		}
+		return;
+	}
+	for (int i = now; i <= n; i++)
+	{
+		if (visit[i] == 0)
+		{
+			visit[i] = 1;
+			make_team(i,cnt + 1, size);
+			visit[i] = 0;
+		}
+	}
 }
 
 int main()
 {
+	int cnt,a;
+	cin >> n;
+	
+	for (int i = 1; i <= n; i++)
+		cin >> people[i];
 
-    freopen("input.txt","r",stdin);
-    cin>>N;
+	for (int i = 1; i <= n; i++)
+	{
+		cin >> cnt;
+		for (int k = 0; k < cnt; k++)
+		{
+			cin >> a;
+			v[i].push_back(a);
+		}
+	}
 
-    for(int i=1;i<=N;i++)
-    {
-        cin>>num[i];
-    }
+	
+	for (int i = 1; i <= n/2; i++)
+	{
+		make_team(1, 0,i);
+	}
 
-    for(int i=1;i<=N;i++)
-    {
-        cin>>K;
-        for(int j=0;j<K;j++)
-        {
-            int temp;
-            cin>>temp;
-            node[i].push_back(temp);
-        }
-    }
-
-    combi(0);
-    if(res==98787987) res=-1;
-    cout<<res;
-
-    return 0;
+	if (answer == 987654321)
+		answer = -1;
+	cout << answer;
+	return 0;
 }

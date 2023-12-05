@@ -6,10 +6,10 @@ using namespace std;
 int visited[300001];
 int main() {
 
-	int N; //도시 수
-	int M; //도로의 수
-	int K; //거리 정보
-	int X; //출발 도시
+	int N;
+	int M;
+	int K; 
+	int X;
 
 	cin >> N >> M >> K >> X;
 
@@ -25,7 +25,7 @@ int main() {
 	vector<int> result; 
 
 	queue<pair<int,int>> q;
-	q.push({ X,0 }); //시작지점,깊이 0
+	q.push({ X,0 });
 	visited[X] = 1;
 
 	while (!q.empty())
@@ -35,7 +35,7 @@ int main() {
 		q.pop();
 
 
-		if (curDepth == K) //거리와 방문 깊이가 같으면 정답
+		if (curDepth == K)
 		{
 			result.push_back(curNum);
 		}
@@ -51,13 +51,13 @@ int main() {
 		}
 	}
 
-	if (result.size() == 0) //정답 없으면 -1 출력
+	if (result.size() == 0)
 	{
 		cout << -1 << endl;
 		return 0;
 	}
 
-	sort(result.begin(), result.end()); //정렬
+	sort(result.begin(), result.end());
 
 	for (auto a : result)
 		cout << a << '\n';
