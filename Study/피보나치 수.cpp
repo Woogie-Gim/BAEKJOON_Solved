@@ -1,19 +1,33 @@
-#include <string>
 #include <vector>
 
 using namespace std;
 
-int solution(int n)
+const int MOD = 1234567;
+vector<int> memo;
+
+// [상태]     n — 구하려는 항 번호
+// [전이]     f(n) = (f(n-1) + f(n-2)) % MOD
+// [가지치기] memo[n]에 값이 있으면 재계산 안 함
+// [종료]     n <= 1 이면 n 반환
+
+int fibo(int n)
 {
-    vector<long long> dp(n + 1, 0);
-
-    dp[0] = 0;
-    dp[1] = 1;
-
-    for (int i = 2; i <= n; i++)
+    if (n <= 1)
     {
-        dp[i] = dp[i - 1] + dp[i - 2];
+        return n;
     }
 
-    return dp[n];
+    if (memo[n] != -1)
+    {
+        return memo[n];
+    }
+
+    memo[n] = (fibo(n - 1) + fibo(n - 2)) % MOD;
+    return memo[n];
+}
+
+int solution(int n)
+{
+    memo.assign(n + 1, -1);
+    return fibo(n);
 }
